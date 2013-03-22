@@ -3,11 +3,15 @@ GPSLogger
 
 GPS Logging code for use with Raspberry Pi
 
+This is my first attempt at python so please go easy on any bad coding practices or mistakes, feel free to feedback though so I can update and improve the code.
+
 I created this code to help with a project to track a group ride from Manchester, UK to the Paris, France.
 Rather than using our mobiles to track the adventure I decided to build a GPS logger with a Raspberry Pi that would send data back to a web server where people could then track us in real time.
 
 I've run this and tested using Rasbian:
 Linux raspberrypi 3.6.11+ #371 PREEMPT Thu Feb 7 16:31:35 GMT 2013 armv6l GNU/Linux
+
+Excuse the mp3 files, I use these to track if the unit is working when out and about :)
 
 This code is the result.
 
@@ -26,4 +30,47 @@ This code is the result.
 
 To install and setup, follow these instructions.
 
-1. To follow...
+1.  cd /home/pi
+    git clone git://github.com/laf/GPSLogger.git
+    cd GPSLogger
+
+2. Edit config.py and set the following variables with your twitter API keys
+    'consumer_key':"CONSUMER_KEY",
+    'consumer_secret':"CONSUMER_SECRET",
+    'access_token':"ACCESS_TOKEN",
+    'access_token_secret':"ACCESS_TOKEN_SECRET",
+
+    You can also adjust the tweetTime variable to set how often the code will post an update to twitter. Value is in seconds and defaults to 900
+    
+3. Edit gpsFunctions.py and set the following:
+    apiURL = '' # Set this to the website you want to post data to. This is just in the format  www.DOMAIN.TLD (i.e www.google.co.uk)
+    APIKEY # Set this to the KEY in the web code to stop people posting data.
+    statusURL = '' # Set this to the full url that returns a status response.
+    sessionURL = '' # Set this to the full url for where session ID's are retrieved from.
+    
+
+4. If you want to edit the twitter statuses that are posted then look for lines with api.update_status
+
+5. Add this line to crontab, this wil monitor the main logging script and restart if it fails:
+    * * * * * /usr/bin/python /home/pi/GPSLogger/monitor.py
+
+6. To /etc/rc.local add the following before any exit line:
+    /usr/bin/python /home/pi/GPSLogger/screen.py
+
+7. Install GPS modules for pythong and Raspbian:
+    apt-get install gpsd
+    apt-get install gpsd-clients
+    apt-get install python-gps
+
+8. Install sqlite3 for storing local data:
+    apt-get install sqlite3
+
+9. Create the sqlite3 database and relevant table:
+    sqlite3 /home/pi/GPSLogger/gpslog.db
+    create table gpslog (id INTEGER PRIMARY KEY,datetime varchar(30),lon varchar(100),lat varchar(100),alt varchar(100),speed varchar(100),uploaded varchar(1),session_id INT);
+
+10. Reboot the pi and it should now start, gpsd and two screen sessions which you can connect to keep an eye on the status of things:
+    screen -r logging
+    screen -r check
+
+The logging session is what does the majority of the data logging and uploading. The check session keeps an eye on any failed data that doesn't upload and trys again.
