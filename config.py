@@ -5,5 +5,5 @@ config = {
 	'consumer_secret':"CONSUMER_SECRET",
 	'access_token':"ACCESS_TOKEN",
 	'access_token_secret':"ACCESS_TOKEN_SECRET",
-	'tweetTime':'900'
+	'tweetTime':900
 }
