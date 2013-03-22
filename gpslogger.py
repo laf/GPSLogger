@@ -25,7 +25,7 @@ pidfile.close
 print datetime.datetime.utcnow()
 
 # Connect to Sqlite3 DB
-conn = sqlite3.connect('/home/pi/GPS/gpslog.db')
+conn = sqlite3.connect('/home/pi/GPSLogger/gpslog.db')
 c = conn.cursor()
 
 # Listen on port 2947 (gpsd) of localhost
@@ -48,7 +48,7 @@ if sessionID > 0:
 	api.update_status("We've started a ride, keep a track online http://DOMAIN.co.uk/rides.php?id=%s %s" % (sessionID, curTime))
 else:
 	api.update_status('GPS logging started @ %s' % (curTime))
-os.system('mpg321 /home/pi/GPS/MP3/logging_started.mp3 &')
+os.system('mpg321 /home/pi/GPSLogger/MP3/logging_started.mp3 &')
 counter = 0
 failCounter = 0
 
@@ -82,7 +82,7 @@ while True:
 				uploadResponse = uploadData ( gpsdate=gpstime, gpslon=gpslon,gpslat=gpslat,gpsalt=gpsalt,gpsspeed=gpsspeed,gpssession=sessionID )
 
 				if counter >= config['tweetTime']:
-					os.system('mpg321 /home/pi/GPS/MP3/logging_data.mp3 &')
+					os.system('mpg321 /home/pi/GPSLogger/MP3/logging_data.mp3 &')
 					print 'Updating twitter',datetime.datetime.utcnow()
 					now=datetime.datetime.now()
 					curTime = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
@@ -103,7 +103,7 @@ while True:
 				print 'Data error from gps',gpstime,gpslon,gpslat,gpsalt,gpsspeed,datetime.datetime.utcnow()
 				if failCounter >= 60:
 					print 'Playing gps error file',datetime.datetime.utcnow()
-					os.system('mpg321 /home/pi/GPS/MP3/gps_error.mp3 &')
+					os.system('mpg321 /home/pi/GPSLogger/MP3/gps_error.mp3 &')
 					failCounter = 0
 
 	except KeyError:

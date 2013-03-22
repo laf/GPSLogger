@@ -11,7 +11,7 @@ try:
 			for line in f:
 				if os.path.exists("/proc/%s" % line) == False:
 					print 'not running'
-					os.system("/usr/bin/screen -c /home/pi/.screenrc -t logger -L -d -m -S logger -- /usr/bin/python /home/pi/GPS/gpslogger.py")
+					os.system("/usr/bin/screen -c /home/pi/.screenrc -t logger -L -d -m -S logger -- /usr/bin/python /home/pi/GPSLogger/gpslogger.py")
 except KeyError:
 	pass
 except KeyboardInterrupt:
