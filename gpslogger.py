@@ -79,7 +79,7 @@ while True:
 			if gpstime and gpslon and gpslat and gpsalt and gpsspeed:
 				counter += 1
 
-				uploadResponse = uploadData ( gpsdate=gpstime, gpslon=gpslon,gpslat=gpslat,gpsalt=gpsalt,gpsspeed=gpsspeed,gpssession=sessionID )
+				uploadResponse = uploadData ( gpsdate=unicode(gpstime), gpslon=unicode(gpslon),gpslat=unicode(gpslat),gpsalt=unicode(gpsalt),gpsspeed=unicode(gpsspeed),gpssession=unicode(sessionID) )
 
 				if counter >= config['tweetTime']:
 					os.system('mpg321 /home/pi/GPSLogger/MP3/logging_data.mp3 &')
