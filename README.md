@@ -65,12 +65,23 @@ To install and setup, follow these instructions.
 8. Install sqlite3 for storing local data:
     apt-get install sqlite3
 
-9. Create the sqlite3 database and relevant table:
+9. Install screen to allow for monitoring
+	apt-get install screen
+
+10. Create the sqlite3 database and relevant table:
     sqlite3 /home/pi/GPSLogger/gpslog.db
     create table gpslog (id INTEGER PRIMARY KEY,datetime varchar(30),lon varchar(100),lat varchar(100),alt varchar(100),speed varchar(100),uploaded varchar(1),session_id INT);
 
-10. Reboot the pi and it should now start, gpsd and two screen sessions which you can connect to keep an eye on the status of things:
+11. Reboot the pi and it should now start, gpsd and two screen sessions which you can connect to keep an eye on the status of things:
     screen -r logging
     screen -r check
 
 The logging session is what does the majority of the data logging and uploading. The check session keeps an eye on any failed data that doesn't upload and trys again.
+
+If you get a "gpsd:ERROR: device open fail: Permission denied - retrying read-only" you may be able to resolve this by updatingthe permissions on the device
+
+	Add the following to you /var/udev/gpsd.hotplug
+	
+	chmod a+rw $DEVNAME
+	
+	At the end of the file just above "gpsdctl $ACTION $DEVNAME"
