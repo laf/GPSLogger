@@ -13,7 +13,7 @@ while True:
 	Response = checkAPI()
 	if Response == 'OK':
 		print 'API responding ok'
-		conn = sqlite3.connect('/home/pi/GPS/gpslog.db')
+		conn = sqlite3.connect('/home/pi/GPSLogger/gpslog.db')
 		c = conn.cursor()
 		# Ok, now lets check if we have any data to process
 		c.execute("SELECT * FROM gpslog WHERE uploaded='N'")
