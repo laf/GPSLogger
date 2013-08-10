@@ -64,6 +64,7 @@ while True:
 		gpslat = ''
 		gpsalt = ''
 		gpsspeed = ''
+		gpsmode = ''
 		if report['class'] == 'TPV':
 			if hasattr(report, 'time'):
 				gpstime = report.time
@@ -75,8 +76,10 @@ while True:
 				gpsalt = report.alt
 			if hasattr(report, 'speed'):
 				gpsspeed = report.speed
+			if hasattr(report, 'mode'):
+			 	gpssmode = report.mode
 
-			if gpstime and gpslon and gpslat and gpsalt and gpsspeed:
+			if gpstime and gpslon and gpslat and gpsalt and gpsspeed and gpsmode >= config['allowedGPSmodes']:
 				counter += 1
 
 				uploadResponse = uploadData ( gpsdate=unicode(gpstime), gpslon=unicode(gpslon),gpslat=unicode(gpslat),gpsalt=unicode(gpsalt),gpsspeed=unicode(gpsspeed),gpssession=unicode(sessionID) )

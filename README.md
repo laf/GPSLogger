@@ -34,14 +34,23 @@ To install and setup, follow these instructions.
     git clone git://github.com/laf/GPSLogger.git
     cd GPSLogger
 
-2. Edit config.py and set the following variables with your twitter API keys
+2. Edit config.py
+
+	Set the following variables with your twitter API keys
     'consumer_key':"CONSUMER_KEY",
     'consumer_secret':"CONSUMER_SECRET",
     'access_token':"ACCESS_TOKEN",
     'access_token_secret':"ACCESS_TOKEN_SECRET",
 
     You can also adjust the tweetTime variable to set how often the code will post an update to twitter. Value is in seconds and defaults to 900
-    
+
+	Set the lowest GPS modes you will accpet a position for
+	'allowedGPSmodes':2
+
+	mode 1 - no valid data
+	mode 2 - 2D fix, do not use mode 2 if you are intrested in climb or alt
+	mode 3 - 3D-Fix, for a 3D-Fix you must have a minimum of 4 satellites
+
 3. Edit gpsFunctions.py and set the following:
     apiURL = '' # Set this to the website you want to post data to. This is just in the format  www.DOMAIN.TLD (i.e www.google.co.uk)
     APIKEY # Set this to the KEY in the web code to stop people posting data.
