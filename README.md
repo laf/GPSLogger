@@ -37,10 +37,12 @@ To install and setup, follow these instructions.
 2. Edit config.py
 
 	Set the following variables with your twitter API keys
-    'consumer_key':"CONSUMER_KEY",
-    'consumer_secret':"CONSUMER_SECRET",
-    'access_token':"ACCESS_TOKEN",
-    'access_token_secret':"ACCESS_TOKEN_SECRET",
+```
+	'consumer_key':"CONSUMER_KEY",
+	'consumer_secret':"CONSUMER_SECRET",
+	'access_token':"ACCESS_TOKEN",
+	'access_token_secret':"ACCESS_TOKEN_SECRET",
+```
 
     You can also adjust the tweetTime variable to set how often the code will post an update to twitter. Value is in seconds and defaults to 900
 
@@ -67,9 +69,15 @@ To install and setup, follow these instructions.
     /usr/bin/python /home/pi/GPSLogger/screen.py
 
 7. Install GPS modules for pythong and Raspbian:
-    apt-get install gpsd
-    apt-get install gpsd-clients
-    apt-get install python-gps
+
+	* make install
+
+	or
+```
+	apt-get install gpsd
+	apt-get install gpsd-clients
+	apt-get install python-gps
+```
 
 8. Install sqlite3 for storing local data:
     apt-get install sqlite3
@@ -82,15 +90,17 @@ To install and setup, follow these instructions.
     create table gpslog (id INTEGER PRIMARY KEY,datetime varchar(30),lon varchar(100),lat varchar(100),alt varchar(100),speed varchar(100),uploaded varchar(1),session_id INT);
 
 11. Reboot the pi and it should now start, gpsd and two screen sessions which you can connect to keep an eye on the status of things:
+```
     screen -r logging
     screen -r check
+```
 
 The logging session is what does the majority of the data logging and uploading. The check session keeps an eye on any failed data that doesn't upload and trys again.
 
 If you get a "gpsd:ERROR: device open fail: Permission denied - retrying read-only" you may be able to resolve this by updatingthe permissions on the device
 
-	Add the following to you /var/udev/gpsd.hotplug
-	
-	chmod a+rw $DEVNAME
-	
-	At the end of the file just above "gpsdctl $ACTION $DEVNAME"
+Add the following to you /var/udev/gpsd.hotplug
+```
+chmod a+rw $DEVNAME
+```
+At the end of the file just above "gpsdctl $ACTION $DEVNAME"
