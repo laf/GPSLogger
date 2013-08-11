@@ -34,14 +34,51 @@ To install and setup, follow these instructions.
     git clone git://github.com/laf/GPSLogger.git
     cd GPSLogger
 
+
+## Automatic dependencies installation
+
+```
+make install
+make cleandb
+```
+
+## Manual dependencies installation
+
+#### Install GPS modules for pythong and Raspbian:
+
+```
+apt-get install gpsd
+apt-get install gpsd-clients
+apt-get install python-gps
+```
+
+#### Install sqlite3 for storing local data:
+
+````
+apt-get install sqlite3
+````
+
+#### Install screen to allow for monitoring
+````
+apt-get install screen
+````
+
+#### Create the sqlite3 database and relevant table:
+
+````    
+sqlite3 /home/pi/GPSLogger/gpslog.db
+create table gpslog (id INTEGER PRIMARY KEY,datetime varchar(30),lon varchar(100),lat varchar(100),alt varchar(100),speed varchar(100),uploaded varchar(1),session_id INT);
+````
+
+
 2. Edit config.py
 
 	Set the following variables with your twitter API keys
 ```
-	'consumer_key':"CONSUMER_KEY",
-	'consumer_secret':"CONSUMER_SECRET",
-	'access_token':"ACCESS_TOKEN",
-	'access_token_secret':"ACCESS_TOKEN_SECRET",
+'consumer_key':"CONSUMER_KEY",
+'consumer_secret':"CONSUMER_SECRET",
+'access_token':"ACCESS_TOKEN",
+'access_token_secret':"ACCESS_TOKEN_SECRET",
 ```
 
     You can also adjust the tweetTime variable to set how often the code will post an update to twitter. Value is in seconds and defaults to 900
@@ -68,26 +105,6 @@ To install and setup, follow these instructions.
 6. To /etc/rc.local add the following before any exit line:
     /usr/bin/python /home/pi/GPSLogger/screen.py
 
-7. Install GPS modules for pythong and Raspbian:
-
-	* make install
-
-	or
-```
-	apt-get install gpsd
-	apt-get install gpsd-clients
-	apt-get install python-gps
-```
-
-8. Install sqlite3 for storing local data:
-    apt-get install sqlite3
-
-9. Install screen to allow for monitoring
-	apt-get install screen
-
-10. Create the sqlite3 database and relevant table:
-    sqlite3 /home/pi/GPSLogger/gpslog.db
-    create table gpslog (id INTEGER PRIMARY KEY,datetime varchar(30),lon varchar(100),lat varchar(100),alt varchar(100),speed varchar(100),uploaded varchar(1),session_id INT);
 
 11. Reboot the pi and it should now start, gpsd and two screen sessions which you can connect to keep an eye on the status of things:
 ```
