@@ -6,6 +6,6 @@ install:$(call print-help,install           ,Installs all needed dependancies.)
 	sudo easy_install tweepy
 
 cleandb:$(call print-help,cleandb			,Drops and re-creates the databse files)
-	gpsmakedb.py
+	./gpsmakedb.py
 
 default: help
