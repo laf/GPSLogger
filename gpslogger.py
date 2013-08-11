@@ -25,7 +25,7 @@ pidfile.close
 print datetime.datetime.utcnow()
 
 # Connect to Sqlite3 DB
-conn = sqlite3.connect('/home/pi/GPSLogger/gpslog.db')
+conn = sqlite3.connect(config['DB_NAME'])
 c = conn.cursor()
 
 # Listen on port 2947 (gpsd) of localhost
