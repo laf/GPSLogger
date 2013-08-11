@@ -6,5 +6,9 @@ config = {
 	'access_token':"ACCESS_TOKEN",
 	'access_token_secret':"ACCESS_TOKEN_SECRET",
 	'tweetTime':900,
+<<<<<<< HEAD
+=======
+	'DB_NAME':'/home/pi/GPSLogger/gpslog.db',
+>>>>>>> GPSmode
 	'allowedGPSmodes':2
 }
