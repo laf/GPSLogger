@@ -1,2 +1,4 @@
 gpslog.db
 .DS_Store
+# .pyc They contain byte code, which is what the Python interpreter compiles the source to.
+*.pyc
