@@ -45,7 +45,7 @@ now=datetime.datetime.now()
 curTime = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
 print curTime
 if sessionID > 0:
-	api.update_status("We've started a ride, keep a track online http://DOMAIN.co.uk/rides.php?id=%s %s" % (sessionID, curTime))
+	api.update_status("We've started a ride, keep a track online http://%s/rides.php?id=%s %s" % (config['website'],sessionID, curTime))
 else:
 	api.update_status('GPS logging started @ %s' % (curTime))
 os.system('mpg321 /home/pi/GPSLogger/MP3/logging_started.mp3 &')
@@ -89,7 +89,7 @@ while True:
 					print 'Updating twitter',datetime.datetime.utcnow()
 					now=datetime.datetime.now()
 					curTime = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
-					api.update_status("Hey, see where we are riding right now http://www.DOMAIN.co.uk/rides.php?id=%s @ %s" % (sessionID,curTime))
+					api.update_status("Hey, see where we are riding right now http://%s/rides.php?id=%s @ %s" % (config['website'],sessionID,curTime))
 					counter = 0
 
 				if uploadResponse != 'OK':

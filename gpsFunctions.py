@@ -2,13 +2,14 @@
 
 import httplib, urllib, socket, os
 from urllib2 import Request, urlopen, URLError, HTTPError
+from config import config
 
 def uploadData ( gpsdate,gpslon,gpslat,gpsalt,gpsspeed,gpssession ):
 	"Pass data to this function to upload to web api"
 
 	Response = ''
 
-	apiURL = 'www.DOMAIN.co.uk'
+	apiURL = config['website']
 	gps_json = {'timelog': gpsdate, 'lon':  gpslon, 'lat': gpslat, 'alt': gpsalt, 'speed': gpsspeed, 'session': gpssession}
 	params = urllib.urlencode(gps_json)
 	headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
@@ -35,7 +36,7 @@ def uploadData ( gpsdate,gpslon,gpslat,gpsalt,gpsspeed,gpssession ):
 def checkAPI ():
 	"Check the API is up and running so we can remote log data"
 
-	statusURL = 'http://www.DOMAIN.co.uk/gps_status.php'
+	statusURL = string.join('http://',config['website'],'/gps_status.php')
 	Response = ''
 	req = Request(statusURL)
 	try:
@@ -54,7 +55,7 @@ def currentSession ():
 	socket.setdefaulttimeout(1)
 
 	sessionID = 0
-	sessionURL = 'http://www.DOMAIN.co.uk/gps_session.php'
+	sessionURL = string.join('http://',config['website'],'/gps_session.php')
 	ResponseSession = ''
 	reqSession = Request(sessionURL)
 	try:
