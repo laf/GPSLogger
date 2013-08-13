@@ -44,10 +44,12 @@ now=datetime.datetime.now()
 curTime = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
 print curTime
 
-if sessionID > 0 and config['enabletweet'] > 0 :
-	api.update_status("We've started a ride, keep a track online http://%s/rides.php?id=%s %s" % (config['website'],sessionID, curTime))
-else:
-	api.update_status('GPS logging started @ %s' % (curTime))
+if config['enabletweet'] > 0 :
+	if sessionID > 0 :
+		api.update_status("We've started a ride, keep a track online http://%s/rides.php?id=%s %s" % (config['website'],sessionID, curTime))
+	else:
+		api.update_status('GPS logging started @ %s' % (curTime))
+
 os.system('mpg321 /home/pi/GPSLogger/MP3/logging_started.mp3 &')
 counter = 0
 failCounter = 0
@@ -84,7 +86,7 @@ while True:
 
 				uploadResponse = uploadData ( gpsdate=unicode(gpstime), gpslon=unicode(gpslon),gpslat=unicode(gpslat),gpsalt=unicode(gpsalt),gpsspeed=unicode(gpsspeed),gpssession=unicode(sessionID) )
 
-				if counter >= config['tweetTime'] and config['enabletweet'] > 0::
+				if counter >= config['tweetTime'] and config['enabletweet'] > 0:
 					os.system('mpg321 /home/pi/GPSLogger/MP3/logging_data.mp3 &')
 					print 'Updating twitter',datetime.datetime.utcnow()
 					now=datetime.datetime.now()

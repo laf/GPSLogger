@@ -49,6 +49,9 @@ make cleandb
 ```
 apt-get install gpsd
 apt-get install gpsd-clients
+apt-get install python-dev
+apt-get install python-setuptools
+apt-get install python-rpi.gpio
 apt-get install python-gps
 ```
 
@@ -61,6 +64,11 @@ apt-get install sqlite3
 #### Install screen to allow for monitoring
 ````
 apt-get install screen
+````
+
+#### Install mpeg321 to allow for audio alersts and monitoring
+````
+apt-get install mpeg321
 ````
 
 #### Create the sqlite3 database and relevant table:

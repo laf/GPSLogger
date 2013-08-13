@@ -7,7 +7,7 @@ from gpsFunctions import uploadData, checkAPI
 from time import sleep
 
 # We don't want to start uploading data until at least 5 minutes after we start
-sleep(300)
+#sleep(300)
 
 while True:
 	Response = checkAPI()
