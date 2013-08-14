@@ -60,11 +60,13 @@ def currentSession ():
 	try:
 		session_response = urlopen(reqSession)
 		tmpSession = session_response.read()
-		if tmpSession >= 1:
+		if isinstance( tmpSession, int ) and tmpSession >= 1:
 			sessionID = tmpSession
 
 	except URLError as e:
 		print 'FAIL connecting to session API'
 
-	return sessionID
+	except HTTPError as he:
+		print 'FAIL connecting to session API'
 
+	return sessionID

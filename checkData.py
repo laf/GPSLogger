@@ -16,7 +16,8 @@ while True:
 		conn = sqlite3.connect('/home/pi/GPSLogger/gpslog.db')
 		c = conn.cursor()
 		# Ok, now lets check if we have any data to process
-		c.execute("SELECT * FROM gpslog WHERE uploaded='N'")
+
+		c.execute("SELECT id,timeutc,longitude,latitude,altitude,speed,trip FROM gpslog WHERE uploaded=false")
 		rows = c.fetchall()
 		for row in rows:
 			

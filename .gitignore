@@ -1,0 +1,12 @@
+# we don;t want to track the databse
+gpslog.db
+gpslog.db-journal
+
+# .pyc They contain byte code, which is what the Python interpreter compiles the source to.
+*.pyc
+
+# Ignore local config
+config.py
+
+# Other junk that comes along !
+.DS_Store
