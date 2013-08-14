@@ -50,7 +50,8 @@ if config['enabletweet'] > 0 :
 	else:
 		api.update_status('GPS logging started @ %s' % (curTime))
 
-os.system('mpg321 /home/pi/GPSLogger/MP3/logging_started.mp3 &')
+os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/logging_started.mp3 &')
+sequence = 0
 counter = 0
 failCounter = 0
 
@@ -60,34 +61,36 @@ while True:
 		# Wait for a 'TPV' report and display the current time
 		# To see all report data, uncomment the line below
 		#print report
-		logged = 'NO'
-		gpstime = ''
-		gpslon = ''
-		gpslat = ''
-		gpsalt = ''
-		gpsspeed = ''
-		gpsmode = ''
+
 		if report['class'] == 'TPV':
-			if hasattr(report, 'time'):
-				gpstime = report.time
-			if hasattr(report, 'lon'):
-				gpslon = report.lon
-			if hasattr(report, 'lat'):
-				gpslat = report.lat
-			if hasattr(report, 'alt'):
-				gpsalt = report.alt
-			if hasattr(report, 'speed'):
-				gpsspeed = report.speed
-			if hasattr(report, 'mode'):
-			 	gpssmode = report.mode
 
-			if gpstime and gpslon and gpslat and gpsalt and gpsspeed and gpsmode >= config['allowedGPSmodes']:
+			print
+			print
+			print '----------------------------------------'
+			print 'latitude         ' , session.fix.latitude
+			print 'longitude        ' , session.fix.longitude
+			print 'time utc         ' , session.utc,' + ', session.fix.time
+			print 'altitude (m)     ' , session.fix.altitude
+			print 'speed (m/s)      ' , session.fix.speed
+			print 'climb            ' , session.fix.climb
+			print 'eps,epx,epv,ept  ' , session.fix.eps , session.fix.epx , session.fix.epv , session.fix.ept
+			print 'track            ' , session.fix.track
+			print 'satellites       ' , len(session.satellites) , 'in view' 
+			print 'mode             ' , session.fix.mode
+			print 'min mode to use  ' , config['allowedGPSmodes']
+
+			if session.fix.mode >= int(config['allowedGPSmodes']):
+				sequence += 1
 				counter += 1
-
-				uploadResponse = uploadData ( gpsdate=unicode(gpstime), gpslon=unicode(gpslon),gpslat=unicode(gpslat),gpsalt=unicode(gpsalt),gpsspeed=unicode(gpsspeed),gpssession=unicode(sessionID) )
+				print 'sequence         ' , sequence
+				try :
+					uploadResponse = uploadData ( session.utc, session.fix.longitude,session.fix.latitude,session.fix.altitude,session.fix.speed,gpssession=0 )
+				except Exception, e:
+					uploadResponse = "ERROR" 
+					print "Upload error : ",e
 
 				if counter >= config['tweetTime'] and config['enabletweet'] > 0:
-					os.system('mpg321 /home/pi/GPSLogger/MP3/logging_data.mp3 &')
+					os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/logging_data.mp3 &')
 					print 'Updating twitter',datetime.datetime.utcnow()
 					now=datetime.datetime.now()
 					curTime = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
@@ -97,18 +100,25 @@ while True:
 				if uploadResponse != 'OK':
 					# Write data to local sqlitedb
 					print uploadResponse,datetime.datetime.utcnow()
-					gpsData = [gpstime, gpslon, gpslat, gpsalt, gpsspeed, 'N', sessionID]
-					c.execute("INSERT INTO gpslog (datetime,lon,lat,alt,speed,uploaded,session_id) VALUES (?,?,?,?,?,?,?);", gpsData)
-					conn.commit()
-					#c.execute("create table gpslog (id INT primary key,datetime varchar(30),lon varchar(100),lat varchar(100),alt varchar(100),speed varchar(100),uploaded varchar(1));")
+					event = 'POSITION'
+					distance = 0
+					trip = 0
+					gpsData = [event, sequence, trip, session.fix.latitude, session.fix.longitude, session.utc, datetime.datetime.utcnow() , session.fix.altitude, session.fix.eps, session.fix.epx, session.fix.epv, session.fix.ept, session.fix.speed, session.fix.climb, session.fix.track, session.fix.mode, len(session.satellites), distance]
+					try :
+						c.execute("INSERT INTO gpslog (event, sequence, trip, latitude, longitude, timeutc, systimeutc, altitude, eps, epx, epv, ept, speed, climb, track, mode, satellites, distance ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", gpsData)
+						conn.commit()
+						print "Data save OK " , datetime.datetime.utcnow()
+					except Exception, e:
+						print "Data save Error" , datetime.datetime.utcnow()
+						print e
 				else:
-					print 'Data uploaded', uploadResponse,datetime.datetime.utcnow()
+					print 'Data uploaded ok', datetime.datetime.utcnow()
 			else:
 				failCounter += 1
-				print 'Data error from gps',gpstime,gpslon,gpslat,gpsalt,gpsspeed,datetime.datetime.utcnow()
+				print 'Poor position information form  gpsd' , datetime.datetime.utcnow()
 				if failCounter >= 60:
-					print 'Playing gps error file',datetime.datetime.utcnow()
-					os.system('mpg321 /home/pi/GPSLogger/MP3/gps_error.mp3 &')
+					print 'Playing gps error file' , datetime.datetime.utcnow()
+					os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/gps_error.mp3 &')
 					failCounter = 0
 
 	except KeyError:

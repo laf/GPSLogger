@@ -50,8 +50,8 @@ def checkAPI ():
 	return Response
 
 def currentSession ():
-	print "Get the current session id"
-	#socket.setdefaulttimeout(1)
+	"Get the current session id"
+	socket.setdefaulttimeout(1)
 
 	sessionID = 0
 	sessionURL = 'http://www.DOMAIN.co.uk/gps_session.php'
@@ -60,8 +60,7 @@ def currentSession ():
 	try:
 		session_response = urlopen(reqSession)
 		tmpSession = session_response.read()
-#		print tmpSession
-		if tmpSession >= 1:
+		if isinstance( tmpSession, int ) and tmpSession >= 1:
 			sessionID = tmpSession
 
 	except URLError as e:
