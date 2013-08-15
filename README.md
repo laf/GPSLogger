@@ -73,7 +73,7 @@ apt-get install mpeg321
 
 #### Create the sqlite3 database and relevant table:
 
-````    
+````
 sqlite3 /home/pi/GPSLogger/gpslog.db
 create table gpslog (id INTEGER PRIMARY KEY,datetime varchar(30),lon varchar(100),lat varchar(100),alt varchar(100),speed varchar(100),uploaded varchar(1),session_id INT);
 ````
@@ -85,16 +85,16 @@ create table gpslog (id INTEGER PRIMARY KEY,datetime varchar(30),lon varchar(100
 ### Edit config.py
 
 #### Set the following variables with your twitter API keys
-```
+````
 'consumer_key':"CONSUMER_KEY",
 'consumer_secret':"CONSUMER_SECRET",
 'access_token':"ACCESS_TOKEN",
 'access_token_secret':"ACCESS_TOKEN_SECRET",
-```
+````
 
 You can also adjust the tweetTime variable to set how often the code will post an update to twitter. Value is in seconds and defaults to 900
 
-#### Set the lowest GPS modes 
+#### Set the lowest GPS modes
 
 Set the quality of GPS fix that you will accpet a position for
 ````
@@ -109,10 +109,18 @@ Set the quality of GPS fix that you will accpet a position for
     APIKEY # Set this to the KEY in the web code to stop people posting data.
     statusURL = '' # Set this to the full url that returns a status response.
     sessionURL = '' # Set this to the full url for where session ID's are retrieved from.
-    
 
 ### Twitter status
 If you want to edit the twitter statuses that are posted then look for lines with api.update_status
+
+### Upload fail control
+
+As a control to limit the API failures when uploading to your server , should an upload fail you can limit how many positions will pass before an ttempt to upload happens again.
+
+Think being in a location with patchy WiFi
+````
+'api-retry':10,
+````
 
 ### Cron
  Add this line to crontab, this wil monitor the main logging script and restart if it fails:

@@ -54,6 +54,8 @@ os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/logging_started.mp3 &')
 sequence = 0
 counter = 0
 failCounter = 0
+apifailcounter = 0
+apiok = True
 
 while True:
 	try:
@@ -75,7 +77,7 @@ while True:
 			print 'climb            ' , session.fix.climb
 			print 'eps,epx,epv,ept  ' , session.fix.eps , session.fix.epx , session.fix.epv , session.fix.ept
 			print 'track            ' , session.fix.track
-			print 'satellites       ' , len(session.satellites) , 'in view' 
+			print 'satellites       ' , len(session.satellites) , 'in view'
 			print 'mode             ' , session.fix.mode
 			print 'min mode to use  ' , config['allowedGPSmodes']
 
@@ -83,11 +85,19 @@ while True:
 				sequence += 1
 				counter += 1
 				print 'sequence         ' , sequence
-				try :
-					uploadResponse = uploadData ( session.utc, session.fix.longitude,session.fix.latitude,session.fix.altitude,session.fix.speed,gpssession=0 )
-				except Exception, e:
-					uploadResponse = "ERROR" 
-					print "Upload error : ",e
+
+				if apiok :
+					try :
+						uploadResponse = uploadData ( session.utc, session.fix.longitude,session.fix.latitude,session.fix.altitude,session.fix.speed,gpssession=0 )
+					except Exception, e:
+						apiok = False
+						uploadResponse = "ERROR"
+						print "Upload error : ",e
+				else :
+					apifailcounter += 1
+					if apifailcounter > config['api-retry'] :
+						apiok = True
+						apifailcounter = 0
 
 				if counter >= config['tweetTime'] and config['enabletweet'] > 0:
 					os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/logging_data.mp3 &')
