@@ -86,18 +86,16 @@ while True:
 				counter += 1
 				print 'sequence         ' , sequence
 
-				if apiok :
+				if apiok == True :
 					try :
 						uploadResponse = uploadData ( session.utc, session.fix.longitude,session.fix.latitude,session.fix.altitude,session.fix.speed,gpssession=0 )
-					except Exception, e:
-						apiok = False
+					# except Exception, e:
+					except :
 						uploadResponse = "ERROR"
-						print "Upload error : ",e
+						print 'Upload error : '
 				else :
+					print 'API hold retry in ' , config['api-retry'] - apifailcounter 
 					apifailcounter += 1
-					if apifailcounter > config['api-retry'] :
-						apiok = True
-						apifailcounter = 0
 
 				if counter >= config['tweetTime'] and config['enabletweet'] > 0:
 					os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/logging_data.mp3 &')
@@ -110,6 +108,7 @@ while True:
 				if uploadResponse != 'OK':
 					# Write data to local sqlitedb
 					print uploadResponse,datetime.datetime.utcnow()
+					apiok = False
 					event = 'POSITION'
 					distance = 0
 					trip = 0
@@ -121,6 +120,12 @@ while True:
 					except Exception, e:
 						print "Data save Error" , datetime.datetime.utcnow()
 						print e
+
+					if apifailcounter > config['api-retry'] :
+						print "API hold reset"
+						apiok = True
+						apifailcounter = 0
+
 				else:
 					print 'Data uploaded ok', datetime.datetime.utcnow()
 			else:

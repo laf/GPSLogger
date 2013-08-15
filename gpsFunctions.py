@@ -54,7 +54,7 @@ def currentSession ():
 	socket.setdefaulttimeout(1)
 
 	sessionID = 0
-	sessionURL = 'http://www.DOMAIN.co.uk/gps_session.php'
+	sessionURL = 'http://localhost/gps_session.php'
 	ResponseSession = ''
 	reqSession = Request(sessionURL)
 	try:

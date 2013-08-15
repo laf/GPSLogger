@@ -130,7 +130,12 @@ Think being in a location with patchy WiFi
 ### Autostart
  To /etc/rc.local add the following before any exit line:
 ````
-/usr/bin/python /home/pi/GPSLogger/screen.py
+su pi -c "/usr/bin/python /home/pi/GPSLogger/screen.py"
+````
+
+Create a .screenrc
+````
+cat "startup_message off # Turn off the splash screen" > ~/.screenrc 
 ````
 
 Reboot the pi and it should now start, gpsd and two screen sessions which you can connect to keep an eye on the status of things:

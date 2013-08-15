@@ -9,6 +9,6 @@ config = {
 	'enabletweet':0,
 	'DB_NAME':'/home/pi/GPSLogger/gpslog.db',
 	'allowedGPSmodes':2,
-	'api-retry':10,
+	'api-retry':5,
 	'website':"www.somedomain.com"
 }
