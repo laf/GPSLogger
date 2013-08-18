@@ -18,7 +18,7 @@ with con:
 
 	cur.execute("CREATE TABLE gpslog ("
 		"id INTEGER PRIMARY KEY, "
-		"uploaded BOOL DEFATUL false , "
+		"uploaded INT DEFATUL 0 , "
 		"event VARCHAR(16) , "
 		"sequence INTEGER , "
 		"trip INTEGER , "
@@ -47,3 +47,4 @@ with con:
 
 	cur.execute("INSERT INTO extra VALUES(1,'dbversion', '2', 'INT')")
 	cur.execute("INSERT INTO extra VALUES(2, 'hasrunonce', 'true', 'BOOL')")
+	cur.execute("INSERT INTO extra VALUES(2, 'session', '0', 'INT')")
