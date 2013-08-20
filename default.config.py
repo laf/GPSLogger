@@ -1,6 +1,7 @@
 # Script created by Neil Lathwood <neil@lathwood.co.uk>
 
 config = {
+	'deviceid':"pi321",
 	'consumer_key':"CONSUMER_KEY",
 	'consumer_secret':"CONSUMER_SECRET",
 	'access_token':"ACCESS_TOKEN",
@@ -9,5 +10,8 @@ config = {
 	'enabletweet':0,
 	'DB_NAME':'/home/pi/GPSLogger/gpslog.db',
 	'allowedGPSmodes':2,
-	'website':"www.somedomain.com"
+	'api-retry':5,
+	'website':'www.somedomain.com',
+	'webAPI':"http://192.168.1.3/webAPI/server.php",
+	'APIversion':1
 }

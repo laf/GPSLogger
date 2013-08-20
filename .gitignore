@@ -10,3 +10,9 @@ config.py
 
 # Other junk that comes along !
 .DS_Store
+
+webAPI/.idea/misc.xml
+
+webAPI/pos.txt
+
+webAPI/testFile.txt

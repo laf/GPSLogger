@@ -6,11 +6,20 @@ import gps
 import httplib, urllib, socket, os
 from urllib2 import Request, urlopen, URLError, HTTPError
 import shutil
-from gpsFunctions import uploadData, checkAPI, currentSession
+from config import config
+from gisFunctions import haversine
+
+if config['APIversion'] == 1 :
+ 	print "New API in use"
+	from webAPIfunctions  import uploadData, checkAPI, currentSession
+else :
+	print "Old loaded"
+	from gpsFunctions import uploadData, checkAPI, currentSession
+
 import tweepy
 import sqlite3
 import datetime
-from config import config
+
 
 ################################################
 # This script is simply to interface with gpsd #
@@ -38,7 +47,39 @@ if config['enabletweet'] >0 :
 	api = tweepy.API(auth)
 	print api.me().name, datetime.datetime.utcnow()
 
+
+dbsessionID = 0
+try:
+	cur = conn.cursor()
+	cur.execute("SELECT value FROM extra WHERE name='session'")
+	data = cur.fetchone()
+	dbsessionID = int(data[0])
+	dbsessionID += 1 	
+
+except sqlite3.Error, e :
+	print "Error %s:" % e.args[0]
+	dbsessionID = 0
+
+
 sessionID = currentSession()
+
+print "sessionID   : " , sessionID
+print "dbsessionID : " , dbsessionID
+if dbsessionID < sessionID :
+	print "using sessionID"
+	try:
+        	cur = conn.cursor()
+        	cur.execute("UPDATE extra SET value= ?  WHERE name='session'", [str(sessionID)]) 
+        	conn.commit()
+
+	except sqlite3.Error, e :
+        	print "Error %s:" % e.args[0]
+
+else :
+	print "using dbsessionID"
+	sessionID = dbsessionID
+
+
 print 'Session',sessionID
 now=datetime.datetime.now()
 curTime = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
@@ -53,7 +94,16 @@ if config['enabletweet'] > 0 :
 os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/logging_started.mp3 &')
 sequence = 0
 counter = 0
+distance = 0
 failCounter = 0
+apifailcounter = 0
+apiok = True
+event = 'POSITION'
+gpsData = dict()
+lon1 = 0 
+lat1 = 0
+lon2 = 0
+lat2 = 0
 
 while True:
 	try:
@@ -75,7 +125,7 @@ while True:
 			print 'climb            ' , session.fix.climb
 			print 'eps,epx,epv,ept  ' , session.fix.eps , session.fix.epx , session.fix.epv , session.fix.ept
 			print 'track            ' , session.fix.track
-			print 'satellites       ' , len(session.satellites) , 'in view' 
+			print 'satellites       ' , len(session.satellites) , 'in view'
 			print 'mode             ' , session.fix.mode
 			print 'min mode to use  ' , config['allowedGPSmodes']
 
@@ -83,11 +133,53 @@ while True:
 				sequence += 1
 				counter += 1
 				print 'sequence         ' , sequence
-				try :
-					uploadResponse = uploadData ( session.utc, session.fix.longitude,session.fix.latitude,session.fix.altitude,session.fix.speed,gpssession=0 )
-				except Exception, e:
-					uploadResponse = "ERROR" 
-					print "Upload error : ",e
+
+				lon2 = session.fix.longitude
+				lat2 = session.fix.latitude
+
+				if lon1 <> 0 and lat1 <> 0 and lon2 <> 0 and lat2 <> 0 :
+					distance = haversine(lon1, lat1, lon2, lat2)
+					if distance < 3 :
+						distance = 0
+				else :
+					distance = 0
+
+				lon1 = lon2
+				lat1 = lat2
+				lon2 = 0
+				lat2 = 0
+
+				gpsData['posid'] = int(str(sessionID)+str(sequence)) 
+				gpsData['event'] = event
+				gpsData['sequence'] = sequence
+				gpsData['trip'] = sessionID
+				gpsData['latitude'] = session.fix.latitude
+				gpsData['longitude'] = session.fix.longitude
+				gpsData['timeutc'] = session.utc
+				gpsData['systimeutc'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S%Z")
+				gpsData['altitude'] = session.fix.altitude
+				gpsData['eps'] = session.fix.eps
+				gpsData['epx'] = session.fix.epx
+				gpsData['epv'] = session.fix.epv
+				gpsData['ept'] = session.fix.ept
+				gpsData['speed'] = session.fix.speed
+				gpsData['climb'] = session.fix.climb
+				gpsData['track'] = session.fix.track
+				gpsData['mode'] = session.fix.mode
+				gpsData['satellites'] = len(session.satellites)
+				gpsData['distance'] = distance
+
+				if apiok == True :
+
+					try :
+						uploadResponse = uploadData(gpsData)
+					except Exception, e:
+					# except :
+						uploadResponse = "ERROR"
+						print 'Upload error : ' , e
+				else :
+					print 'API hold retry in ' , config['api-retry'] - apifailcounter 
+					apifailcounter += 1
 
 				if counter >= config['tweetTime'] and config['enabletweet'] > 0:
 					os.system('mpg321 --quiet /home/pi/GPSLogger/MP3/logging_data.mp3 &')
@@ -100,17 +192,21 @@ while True:
 				if uploadResponse != 'OK':
 					# Write data to local sqlitedb
 					print uploadResponse,datetime.datetime.utcnow()
-					event = 'POSITION'
-					distance = 0
-					trip = 0
-					gpsData = [event, sequence, trip, session.fix.latitude, session.fix.longitude, session.utc, datetime.datetime.utcnow() , session.fix.altitude, session.fix.eps, session.fix.epx, session.fix.epv, session.fix.ept, session.fix.speed, session.fix.climb, session.fix.track, session.fix.mode, len(session.satellites), distance]
+					apiok = False
+					gpsDataStore = [event, sequence, sessionID, session.fix.latitude, session.fix.longitude, session.utc, datetime.datetime.utcnow() , session.fix.altitude, session.fix.eps, session.fix.epx, session.fix.epv, session.fix.ept, session.fix.speed, session.fix.climb, session.fix.track, session.fix.mode, len(session.satellites), distance]
 					try :
-						c.execute("INSERT INTO gpslog (event, sequence, trip, latitude, longitude, timeutc, systimeutc, altitude, eps, epx, epv, ept, speed, climb, track, mode, satellites, distance ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", gpsData)
+						c.execute("INSERT INTO gpslog (event, sequence, trip, latitude, longitude, timeutc, systimeutc, altitude, eps, epx, epv, ept, speed, climb, track, mode, satellites, distance ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", gpsDataStore)
 						conn.commit()
 						print "Data save OK " , datetime.datetime.utcnow()
 					except Exception, e:
 						print "Data save Error" , datetime.datetime.utcnow()
 						print e
+
+					if apifailcounter > config['api-retry'] :
+						print "API hold reset"
+						apiok = True
+						apifailcounter = 0
+
 				else:
 					print 'Data uploaded ok', datetime.datetime.utcnow()
 			else:
