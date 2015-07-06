@@ -30,10 +30,11 @@ This code is the result.
 
 To install and setup, follow these instructions.
 
-1.  cd /home/pi
-    git clone git://github.com/laf/GPSLogger.git
-    cd GPSLogger
-
+```bash
+cd /home/pi
+git clone git://github.com/laf/GPSLogger.git
+cd GPSLogger
+```
 
 ## Automatic dependencies installation
 
